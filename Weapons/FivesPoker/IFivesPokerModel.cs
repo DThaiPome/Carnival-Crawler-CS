@@ -16,9 +16,7 @@ namespace CarnivalCrawler.Weapons.FivesPoker
         /// If a joker is drawn, shuffle the deck and draw an extra card.
         /// If the player already has cards, do nothing.
         /// </summary>
-        /// <returns>true if a joker was drawn and the deck was reshuffled,
-        /// false otherwise.</returns>
-        bool DrawHand();
+        void DrawHand();
 
         /// <summary>
         /// If player has cards and has not yet exchanged, then for
@@ -28,5 +26,12 @@ namespace CarnivalCrawler.Weapons.FivesPoker
         /// <param name="isExchanged"></param>
         /// <returns></returns>
         bool[] ExchangeCards(bool[] isExchanged);
+
+        /// <summary>
+        /// Gets how many joker cards were drawn in the last set of draws.
+        /// </summary>
+        /// <returns>number of joker cards drawn since calling DrawHand or
+        /// ExchangeCards</returns>
+        int GetJokersDrawn();
     }
 }
