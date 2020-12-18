@@ -24,8 +24,19 @@ namespace CarnivalCrawler.Weapons.FivesPoker
         /// card and draw another card from the deck
         /// </summary>
         /// <param name="isExchanged"></param>
-        /// <returns></returns>
-        bool[] ExchangeCards(bool[] isExchanged);
+        void ExchangeCards(bool[] isExchanged);
+
+        /// <summary>
+        /// If player has exchanged cards, then return the final hand. Otherwise,
+        /// return junk.
+        /// </summary>
+        /// <returns>The final hand, or junk.</returns>
+        IPokerHand GetFinalHand();
+
+        /// <summary>
+        /// Clears the current hand.
+        /// </summary>
+        void ResetHand();
 
         /// <summary>
         /// Gets how many joker cards were drawn in the last set of draws.

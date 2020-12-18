@@ -11,11 +11,18 @@ namespace CarnivalCrawler.Weapons.FivesPoker
         private Queue<PlayingCard> drawPile;
         private List<PlayingCard> discardPile;
 
+        private PlayingCard[] hand;
+
+        int jokersDrawn;
+
         public FivesPokerModel()
         {
             this.drawPile = new Queue<PlayingCard>();
             this.discardPile = new List<PlayingCard>();
             this.InitCards();
+
+            this.hand = new PlayingCard[5];
+            this.jokersDrawn = 0;
         }
 
         private void InitCards()
@@ -26,6 +33,11 @@ namespace CarnivalCrawler.Weapons.FivesPoker
                 {
                     this.discardPile.Add(new PlayingCard((PlayingCard.Suit)suit, rank));
                 }
+            }
+            int jokerCount = 2;
+            for(int i = 0; i < jokerCount; i++)
+            {
+                this.discardPile.Add(new PlayingCard(PlayingCard.Suit.Joker, 0));
             }
             this.ShuffleDiscardIntoDraw();
         }
@@ -67,15 +79,72 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         public void DrawHand()
         {
-            throw new NotImplementedException();
+            this.jokersDrawn = 0;
+            for(int i = 0; i < this.hand.Length; i++)
+            {
+                this.hand[i] = this.DrawCard();
+            }
         }
 
-        public bool[] ExchangeCards(bool[] isExchanged)
+        private PlayingCard DrawCard()
         {
-            throw new NotImplementedException();
+            List<PlayingCard> jokers = new List<PlayingCard>();
+            PlayingCard card = this.DrawCardConsideringJokers(jokers);
+            foreach(PlayingCard joker in jokers)
+            {
+                this.jokersDrawn++;
+                this.discardPile.Add(joker);
+            }
+            this.ShuffleDiscardIntoDraw();
+            return card;
+        }
+
+        private PlayingCard DrawCardConsideringJokers(List<PlayingCard> jokersList)
+        {
+            if (this.drawPile.Count > 0)
+            {
+                PlayingCard card = this.drawPile.Dequeue();
+                if (card.suit == PlayingCard.Suit.Joker)
+                {
+                    jokersList.Add(card);
+                    return this.DrawCard();
+                }
+                else
+                {
+                    return card;
+                }
+            } else
+            {
+                this.ShuffleDiscardIntoDraw();
+                return this.DrawCard();
+            }
+        }
+
+        public void ExchangeCards(bool[] isExchanged)
+        {
+            this.jokersDrawn = 0;
+            for(int i = 0; i < this.hand.Length; i++)
+            {
+                if (isExchanged[i])
+                {
+                    this.discardPile.Add(this.hand[i]);
+                    this.hand[i] = this.DrawCard();
+                }
+            }
         }
 
         public int GetJokersDrawn()
+        {
+            return this.jokersDrawn;
+        }
+
+        public IPokerHand GetFinalHand()
+        {
+            IPokerHand finalHand = new PokerHand(this.hand);
+            return finalHand;
+        }
+
+        public void ResetHand()
         {
             throw new NotImplementedException();
         }
