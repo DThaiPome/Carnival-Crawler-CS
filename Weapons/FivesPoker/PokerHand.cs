@@ -104,7 +104,7 @@ namespace CarnivalCrawler.Weapons.FivesPoker
             for(int i = 0; i < this.cards.Length; i++)
             {
                 PlayingCard card = this.cards[i];
-                if (this.CheckForOtherPairMember(card, i))
+                if (this.CheckForMatchingRanks(card, i, 1))
                 {
                     cardsInHand.Add(card);
                     return true;
@@ -113,27 +113,29 @@ namespace CarnivalCrawler.Weapons.FivesPoker
             return false;
         }
 
-        private bool CheckForOtherPairMember(PlayingCard firstMember, int firstMemberIndex)
+        private bool CheckForMatchingRanks(PlayingCard firstMember, int firstMemberIndex, int targetCount)
         {
+            int count = 0;
             for(int i = 0; i < this.cards.Length; i++)
             {
                 if (i == firstMemberIndex)
                 {
                     continue;
-                } 
+                }
 
                 PlayingCard card = this.cards[i];
                 if (card.rank == firstMember.rank)
                 {
-                    return true;
+                    count++;
                 }
             }
-            return false;
+            return count == targetCount;
         }
 
         //Assume nothing greater than threes
         private bool CheckForTwoPair(List<PlayingCard> cardsInHand)
         {
+            int pairCount = 0;
             for(int i = 0; i < this.cards.Length; i++)
             {
                 PlayingCard card = this.cards[i];
@@ -141,50 +143,108 @@ namespace CarnivalCrawler.Weapons.FivesPoker
                 {
                     continue;
                 }
-                if (CheckForOtherPairMember(card, i))
+                if (CheckForMatchingRanks(card, i, 1))
                 {
                     cardsInHand.Add(card);
+                    pairCount++;
                 }
-                if (cardsInHand.Count == 2)
+                if (pairCount == 2)
                 {
                     return true;
                 }
             }
+            return false;
         }
 
         private bool CheckForThrees(List<PlayingCard> cardsInHand)
         {
-
+            for (int i = 0; i < this.cards.Length; i++)
+            {
+                PlayingCard card = this.cards[i];
+                if (this.CheckForMatchingRanks(card, i, 2))
+                {
+                    cardsInHand.Add(card);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool CheckForFours(List<PlayingCard> cardsInHand)
         {
-
+            for (int i = 0; i < this.cards.Length; i++)
+            {
+                PlayingCard card = this.cards[i];
+                if (this.CheckForMatchingRanks(card, i, 3))
+                {
+                    cardsInHand.Add(card);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool CheckForFullHouse(List<PlayingCard> cardsInHand)
         {
-
+            return CheckForThrees(cardsInHand) && CheckForPair(cardsInHand);
         }
 
         private bool CheckForFlush(List<PlayingCard> cardsInHand)
         {
-
+            PlayingCard.Suit suit = this.cards[0].suit;
+            for(int i = 1; i < this.cards.Length; i++)
+            {
+                PlayingCard card = this.cards[i];
+                if (card.suit != suit)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private bool CheckForStraight(List<PlayingCard> cardsInHand)
         {
+            List<PlayingCard> cardList = this.cards.ToList();
+            SortCardListByRank(cardList);
+            for(int i = 1; i < this.cards.Length; i++)
+            {
+                PlayingCard card = this.cards[i];
+                PlayingCard prevCard = this.cards[i - 1];
+                if (card.rank != prevCard.rank + 1)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
+        private void SortCardListByRank(List<PlayingCard> cardList)
+        {
+            cardList.Sort(PlayingCard.RankComparison());
         }
 
         private bool CheckForStraightFlush(List<PlayingCard> cardsInHand)
         {
-
+            return CheckForFlush(cardsInHand) && CheckForStraight(cardsInHand);
         }
 
         private bool CheckForRoyalFlush(List<PlayingCard> cardsInHand)
         {
-
+            if (this.CheckForFlush(cardsInHand))
+            {
+                List<PlayingCard> cardList = this.cards.ToList();
+                int[] ranks = { 1, 10, 11, 12, 13 };
+                foreach(int i in ranks)
+                {
+                    if (!cardList.Exists(PlayingCard.CompareRank(i)))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
         public PlayingCard GetCardAt(int index)

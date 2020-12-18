@@ -167,5 +167,13 @@ namespace CarnivalCrawler.Weapons.FivesPoker
                 return other.Equals(card);
             };
         }
+
+        public static Comparison<PlayingCard> RankComparison()
+        {
+            return (c1, c2) =>
+            {
+                return c1.rank - c2.rank;
+            };
+        }
     }
 }
