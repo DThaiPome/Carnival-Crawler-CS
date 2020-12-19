@@ -21,5 +21,11 @@ namespace CarnivalCrawler.ConsoleDisplay
         /// </summary>
         /// <returns>the current display frame.</returns>
         string GetString();
+
+        /// <summary>
+        /// Get the height an width of a model.
+        /// </summary>
+        /// <returns>(rows, columns)</returns>
+        (int, int) GetDimensions();
     }
 }
