@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleDisplay\ConsoleDisplayWindow.cs" />
+    <Compile Include="ConsoleDisplay\FramedDisplayModel.cs" />
     <Compile Include="ConsoleDisplay\IConsoleDisplay.cs" />
     <Compile Include="ConsoleDisplay\IStringFrameModel.cs" />
     <Compile Include="Program.cs" />
