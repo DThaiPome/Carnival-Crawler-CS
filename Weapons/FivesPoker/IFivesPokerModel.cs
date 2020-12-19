@@ -12,25 +12,33 @@ namespace CarnivalCrawler.Weapons.FivesPoker
     public interface IFivesPokerModel
     {
         /// <summary>
-        /// If player has no cards, draw five cards for the player.
-        /// If a joker is drawn, shuffle the deck and draw an extra card.
-        /// If the player already has cards, do nothing.
+        /// If player has no cards, draw five cards for the player. Shuffle
+        /// when jokers are encountered.
+        /// If the player already has cards, throw an error.
         /// </summary>
         void DrawHand();
 
         /// <summary>
         /// If player has cards and has not yet exchanged, then for
         /// each boolean isExchanged[i] that is true, discard the ith
-        /// card and draw another card from the deck
+        /// card and draw another card from the deck.
+        /// If cards have already been exchanged, throw an error.
         /// </summary>
         /// <param name="isExchanged"></param>
         void ExchangeCards(bool[] isExchanged);
 
         /// <summary>
-        /// If player has exchanged cards, then return the final hand. Otherwise,
-        /// return junk.
+        /// If cards have been drawn or exchanged, retrieve the current hand. Otherwise,
+        /// throw an error.
         /// </summary>
-        /// <returns>The final hand, or junk.</returns>
+        /// <returns>the current hand, in an array of cards</returns>
+        PlayingCard[] GetCurrentHand();
+
+        /// <summary>
+        /// If player has exchanged cards, then return the final hand. Otherwise,
+        /// throw an error
+        /// </summary>
+        /// <returns>The final hand</returns>
         IPokerHand GetFinalHand();
 
         /// <summary>

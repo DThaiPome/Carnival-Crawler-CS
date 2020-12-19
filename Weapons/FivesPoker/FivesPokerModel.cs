@@ -15,24 +15,29 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         int jokersDrawn;
 
+        private Random rand;
+
         private enum ModelState
         {
             HandEmpty = 0,
             HandDrawn = 1,
-            CardsExchnaged = 2
+            CardsExchanged = 2
         };
         private ModelState state;
 
-        public FivesPokerModel()
+        public FivesPokerModel(Random rand)
         {
             this.drawPile = new Queue<PlayingCard>();
             this.discardPile = new List<PlayingCard>();
-            this.InitCards();
 
             this.hand = new PlayingCard[5];
             this.jokersDrawn = 0;
             this.state = ModelState.HandEmpty;
+            this.rand = rand;
+            this.InitCards();
         }
+
+        public FivesPokerModel() : this(new Random()) { }
 
         private void InitCards()
         {
@@ -70,11 +75,10 @@ namespace CarnivalCrawler.Weapons.FivesPoker
             }
             PlayingCard[] cardArray = cards.ToArray();
 
-            Random rand = new Random();
             for (int i = 0; i < cardArray.Length; i++)
             {
-                int i1 = rand.Next(cardArray.Length);
-                int i2 = rand.Next(cardArray.Length);
+                int i1 = this.rand.Next(cardArray.Length);
+                int i2 = this.rand.Next(cardArray.Length);
                 PlayingCard t = cardArray[i1];
                 cardArray[i1] = cardArray[i2];
                 cardArray[i2] = t;
@@ -96,6 +100,9 @@ namespace CarnivalCrawler.Weapons.FivesPoker
                     this.hand[i] = this.DrawCard();
                 }
                 this.state = ModelState.HandDrawn;
+            } else
+            {
+                throw new InvalidOperationException("Hand already drawn.");
             }
         }
 
@@ -146,7 +153,10 @@ namespace CarnivalCrawler.Weapons.FivesPoker
                         this.hand[i] = this.DrawCard();
                     }
                 }
-                this.state = ModelState.CardsExchnaged;
+                this.state = ModelState.CardsExchanged;
+            } else
+            {
+                throw new InvalidOperationException("cards already exchanged.");
             }
         }
 
@@ -157,13 +167,12 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         public IPokerHand GetFinalHand()
         {
-            if (this.state == ModelState.CardsExchnaged)
+            if (this.state == ModelState.CardsExchanged)
             {
-                IPokerHand finalHand = new PokerHand(this.hand);
-                return finalHand;
+                return new PokerHand(this.hand);
             } else
             {
-                return this.JunkHand();
+                throw new InvalidOperationException("cards have not yet been exchanged.");
             }
         }
 
@@ -180,7 +189,19 @@ namespace CarnivalCrawler.Weapons.FivesPoker
         public void ResetHand()
         {
             this.hand = new PlayingCard[5];
+            this.jokersDrawn = 0;
             this.state = ModelState.HandEmpty;
+        }
+
+        public PlayingCard[] GetCurrentHand()
+        {
+            if (this.state != ModelState.HandEmpty)
+            {
+                return (PlayingCard[])this.hand.Clone();
+            } else
+            {
+                throw new InvalidOperationException("no hand exists yet");
+            }
         }
     }
 }
