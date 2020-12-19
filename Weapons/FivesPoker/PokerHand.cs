@@ -209,8 +209,8 @@ namespace CarnivalCrawler.Weapons.FivesPoker
             SortCardListByRank(cardList);
             for(int i = 1; i < this.cards.Length; i++)
             {
-                PlayingCard card = this.cards[i];
-                PlayingCard prevCard = this.cards[i - 1];
+                PlayingCard card = cardList[i];
+                PlayingCard prevCard = cardList[i - 1];
                 if (card.rank != prevCard.rank + 1)
                 {
                     return false;

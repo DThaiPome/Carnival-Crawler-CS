@@ -40,6 +40,8 @@ namespace CarnivalCrawler.Weapons.FivesPoker
             this.rank = rank;
         }
 
+        public PlayingCard(int suit, int rank) : this((Suit)suit, rank) { }
+
         /// <summary>
         /// String representation of card.
         /// </summary>
