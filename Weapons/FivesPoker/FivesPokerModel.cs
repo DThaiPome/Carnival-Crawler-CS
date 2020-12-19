@@ -15,6 +15,14 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         int jokersDrawn;
 
+        private enum ModelState
+        {
+            HandEmpty = 0,
+            HandDrawn = 1,
+            CardsExchnaged = 2
+        };
+        private ModelState state;
+
         public FivesPokerModel()
         {
             this.drawPile = new Queue<PlayingCard>();
@@ -23,6 +31,7 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
             this.hand = new PlayingCard[5];
             this.jokersDrawn = 0;
+            this.state = ModelState.HandEmpty;
         }
 
         private void InitCards()
@@ -79,10 +88,14 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         public void DrawHand()
         {
-            this.jokersDrawn = 0;
-            for(int i = 0; i < this.hand.Length; i++)
+            if (this.state == ModelState.HandEmpty)
             {
-                this.hand[i] = this.DrawCard();
+                this.jokersDrawn = 0;
+                for (int i = 0; i < this.hand.Length; i++)
+                {
+                    this.hand[i] = this.DrawCard();
+                }
+                this.state = ModelState.HandDrawn;
             }
         }
 
@@ -122,14 +135,18 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         public void ExchangeCards(bool[] isExchanged)
         {
-            this.jokersDrawn = 0;
-            for(int i = 0; i < this.hand.Length; i++)
+            if (this.state == ModelState.HandDrawn)
             {
-                if (isExchanged[i])
+                this.jokersDrawn = 0;
+                for (int i = 0; i < this.hand.Length; i++)
                 {
-                    this.discardPile.Add(this.hand[i]);
-                    this.hand[i] = this.DrawCard();
+                    if (isExchanged[i])
+                    {
+                        this.discardPile.Add(this.hand[i]);
+                        this.hand[i] = this.DrawCard();
+                    }
                 }
+                this.state = ModelState.CardsExchnaged;
             }
         }
 
@@ -140,13 +157,30 @@ namespace CarnivalCrawler.Weapons.FivesPoker
 
         public IPokerHand GetFinalHand()
         {
-            IPokerHand finalHand = new PokerHand(this.hand);
-            return finalHand;
+            if (this.state == ModelState.CardsExchnaged)
+            {
+                IPokerHand finalHand = new PokerHand(this.hand);
+                return finalHand;
+            } else
+            {
+                return this.JunkHand();
+            }
+        }
+
+        private IPokerHand JunkHand()
+        {
+            PlayingCard[] hand = new PlayingCard[5];
+            for(int i = 0; i < hand.Length; i++)
+            {
+                hand[i] = new PlayingCard((PlayingCard.Suit)(i % 4), (2 * i) + 1);
+            }
+            return new PokerHand(hand);
         }
 
         public void ResetHand()
         {
-            throw new NotImplementedException();
+            this.hand = new PlayingCard[5];
+            this.state = ModelState.HandEmpty;
         }
     }
 }

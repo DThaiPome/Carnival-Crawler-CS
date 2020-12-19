@@ -126,6 +126,11 @@ namespace CarnivalCrawler.Weapons.FivesPoker
                 && this.suit == other.suit;
         }
 
+        public override int GetHashCode()
+        {
+            return ((int)this.suit * 100) + this.rank;
+        }
+
         /// <summary>
         /// Returns a predicate that returns true if the given playing card
         /// is of the given suit.
